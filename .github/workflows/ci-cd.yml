@@ -1,0 +1,40 @@
+name: IntelliDoc AI CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Monorepo Dependencies
+        run: |
+          npm install
+          cd server && npm install
+          cd client && npm install
+
+      - name: Validate TypeScript Compilation
+        run: |
+          npm run build:server
+          npm run build:client
+
+      - name: Run Backend Integration Unit Tests
+        run: |
+          npm run test
+
+      - name: Build Docker Container Image
+        run: |
+          docker build -t intellidoc-ai:latest .
