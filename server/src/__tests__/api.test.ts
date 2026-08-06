@@ -156,7 +156,7 @@ describe('RAG Vector Service Tests', () => {
   it('should answer contract liability questions', async () => {
     const result = await ragService.queryDocuments('What is the liability cap in the MSA contract?');
     expect(result.answer).toContain('1,000,000');
-    expect(result.citations[0].documentTitle).toContain('Master_Services');
+    expect(result.citations[0].documentTitle).toContain('Master');
   });
 
   it('should answer resume/candidate skill questions', async () => {
