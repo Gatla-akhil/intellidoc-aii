@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Sparkles,
   Search,
@@ -27,6 +27,7 @@ import {
   Presentation,
   Hash,
   History,
+  LogOut,
 } from 'lucide-react';
 import { NotificationCenter } from './NotificationCenter';
 
@@ -36,6 +37,8 @@ interface NavbarProps {
   onOpenCommandPalette: () => void;
   isDark: boolean;
   onToggleTheme: () => void;
+  user?: { name: string; email: string; role: string; avatarUrl: string } | null;
+  onLogout?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -44,7 +47,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenCommandPalette,
   isDark,
   onToggleTheme,
+  user,
+  onLogout,
 }) => {
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const horizontalNavItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'autonomous', label: 'Autonomous AI Assistant', icon: Bot, highlight: true },
@@ -132,16 +138,46 @@ export const Navbar: React.FC<NavbarProps> = ({
             {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-400" />}
           </button>
 
-          {/* User Profile Avatar */}
-          <div
-            onClick={() => onNavigate('settings')}
-            className="flex items-center space-x-2 cursor-pointer p-1 rounded-xl hover:bg-slate-900 transition-all"
-          >
-            <img
-              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=250&auto=format&fit=crop"
-              alt="Alex Rivera"
-              className="w-7 h-7 rounded-lg object-cover ring-2 ring-cyan-500/40"
-            />
+          {/* User Profile Avatar + Dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              className="flex items-center space-x-2 cursor-pointer p-1.5 pr-3 rounded-xl hover:bg-slate-900 border border-transparent hover:border-slate-800 transition-all"
+            >
+              <img
+                src={user?.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=250&auto=format&fit=crop'}
+                alt={user?.name || 'User'}
+                className="w-7 h-7 rounded-lg object-cover ring-2 ring-cyan-500/40 shrink-0"
+              />
+              <div className="hidden md:block text-left">
+                <p className="text-xs font-bold text-slate-200 leading-none">{user?.name || 'Alex Rivera'}</p>
+                <p className="text-[10px] text-cyan-400 font-mono mt-0.5">{user?.role || 'ADMIN'}</p>
+              </div>
+            </button>
+            {showUserMenu && (
+              <div className="absolute right-0 top-full mt-2 w-52 rounded-2xl bg-slate-900 border border-slate-800 shadow-2xl shadow-black/60 overflow-hidden z-50">
+                <div className="p-4 border-b border-slate-800">
+                  <p className="text-xs font-bold text-slate-100">{user?.name}</p>
+                  <p className="text-[10px] text-slate-400 truncate">{user?.email}</p>
+                </div>
+                <div className="p-2 space-y-1">
+                  <button
+                    onClick={() => { onNavigate('settings'); setShowUserMenu(false); }}
+                    className="w-full flex items-center space-x-3 px-3 py-2 rounded-xl hover:bg-slate-800 text-xs text-slate-300 transition-colors text-left cursor-pointer"
+                  >
+                    <Settings className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Settings & API Keys</span>
+                  </button>
+                  <button
+                    onClick={() => { if (onLogout) onLogout(); setShowUserMenu(false); }}
+                    className="w-full flex items-center space-x-3 px-3 py-2 rounded-xl hover:bg-red-950/40 hover:border hover:border-red-500/30 text-xs text-red-400 transition-colors text-left cursor-pointer"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
