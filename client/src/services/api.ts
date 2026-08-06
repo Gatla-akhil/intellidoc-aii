@@ -4,7 +4,8 @@ const getApiBase = () => {
   if (typeof window !== 'undefined') {
     const host = window.location.hostname;
     const protocol = window.location.protocol;
-    return `${protocol}//${host}:5000/api/v1`;
+    const port = window.location.port === '5173' ? '5000' : (window.location.port || '5000');
+    return `${protocol}//${host}:${port}/api/v1`;
   }
   return '/api/v1';
 };
