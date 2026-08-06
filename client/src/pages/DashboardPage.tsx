@@ -12,7 +12,9 @@ import {
   ArrowUpRight,
   Clock,
   Sparkles,
+  Download,
 } from 'lucide-react';
+import { exportDocumentData } from '../services/export.service';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, AreaChart, Area } from 'recharts';
 import { ApiClient } from '../services/api';
 import { AnalyticsData, DocumentItem } from '../types';
@@ -301,9 +303,26 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
                     <span className="text-slate-400 font-mono">{doc.piiCount} fields</span>
                   </td>
                   <td className="p-4 text-right">
-                    <button className="px-3.5 py-1 rounded-xl bg-slate-800 hover:bg-cyan-500 hover:text-slate-950 font-bold text-[11px] text-slate-200 transition-colors cursor-pointer">
-                      Inspect →
-                    </button>
+                    <div className="flex items-center justify-end space-x-2">
+                      <div className="flex items-center space-x-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
+                        {(['JSON', 'CSV', 'PDF'] as const).map((fmt) => (
+                          <button
+                            key={fmt}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              exportDocumentData(doc, fmt);
+                            }}
+                            className="px-2 py-0.5 rounded bg-slate-900 hover:bg-cyan-950 hover:text-cyan-300 text-[9px] font-mono font-bold text-slate-400 transition-colors cursor-pointer"
+                            title={`Export ${fmt}`}
+                          >
+                            {fmt}
+                          </button>
+                        ))}
+                      </div>
+                      <button className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-cyan-500 hover:text-slate-950 font-bold text-[11px] text-slate-200 transition-colors cursor-pointer">
+                        Inspect →
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
