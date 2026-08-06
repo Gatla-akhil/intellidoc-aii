@@ -1,6 +1,6 @@
 import { DocumentItem, AnalyticsData, ChatMessageItem, ComparisonReportItem } from '../types';
 
-const API_BASE = '/api/v1';
+const API_BASE = 'http://localhost:5000/api/v1';
 
 export class ApiClient {
   public static async getDocuments(): Promise<DocumentItem[]> {
