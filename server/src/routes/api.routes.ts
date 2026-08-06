@@ -13,7 +13,8 @@ import { compareDocuments } from '../controllers/compare.controller.js';
 import { getDashboardAnalytics } from '../controllers/analytics.controller.js';
 import { authenticateJwt } from '../middleware/auth.js';
 
-const upload = multer({ limits: { fileSize: 50 * 1024 * 1024 } }); // 50MB limit
+// 50MB file size limit - supports PDF, DOCX, PNG, JPG, CSV, XLSX, PPTX, TXT, ZIP
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 } });
 const router = Router();
 
 // Auth Routes
@@ -32,7 +33,8 @@ router.delete('/documents/:id', deleteDocument);
 router.post('/chat', processChatMessage);
 router.post('/compare', compareDocuments);
 
-// Analytics & Metrics Routes
+// Analytics Routes - expose both /dashboard and /overview to fix client mismatch
 router.get('/analytics/dashboard', getDashboardAnalytics);
+router.get('/analytics/overview', getDashboardAnalytics);
 
 export default router;

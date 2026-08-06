@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { dbStore } from '../services/db.service.js';
 
+// Fix: analytics endpoint was at /analytics/overview on client but /analytics/dashboard on server
+// We expose both routes in api.routes.ts, so respond to both via this handler
 export const getDashboardAnalytics = (req: Request, res: Response) => {
   const docs = dbStore.getAll();
   const totalDocs = docs.length;
@@ -37,9 +39,9 @@ export const getDashboardAnalytics = (req: Request, res: Response) => {
         { day: 'Sun', count: 1060, errorCount: 0 },
       ],
       aiModelUsage: [
-        { model: 'Gemini 2.5 Pro', tokens: '42.5M', latency: '380ms', share: '65%' },
-        { model: 'GPT-5.5 Structured', tokens: '18.2M', latency: '520ms', share: '25%' },
-        { model: 'Claude 4 Sonnet', tokens: '6.8M', latency: '440ms', share: '10%' },
+        { model: 'Gemini 2.0 Flash', tokens: '42.5M', latency: '380ms', share: '65%' },
+        { model: 'Vision OCR Engine', tokens: '18.2M', latency: '210ms', share: '25%' },
+        { model: 'Local Synthetic Pipeline', tokens: '6.8M', latency: '40ms', share: '10%' },
       ],
     },
   });
