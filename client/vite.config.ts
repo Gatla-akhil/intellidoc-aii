@@ -13,6 +13,7 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    host: true, // Allows access from other devices on the same Wi-Fi network
     proxy: {
       '/api': {
         target: 'http://localhost:5000',
