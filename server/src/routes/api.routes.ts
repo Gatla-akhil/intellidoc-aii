@@ -24,7 +24,7 @@ router.get('/auth/me', authenticateJwt, getCurrentUser);
 // Document Routes
 router.get('/documents', getDocuments);
 router.get('/documents/:id', getDocumentById);
-router.post('/documents/upload', upload.single('file'), uploadDocument);
+router.post('/documents/upload', upload.any(), uploadDocument);
 router.patch('/documents/field', updateField);
 router.delete('/documents/:id', deleteDocument);
 

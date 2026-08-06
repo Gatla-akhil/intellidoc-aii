@@ -84,7 +84,7 @@ export class ApiClient {
   public static async uploadDocument(file: File, category?: string): Promise<DocumentItem> {
     try {
       const formData = new FormData();
-      formData.append('document', file);
+      formData.append('file', file);
       if (category) formData.append('category', category);
 
       const res = await fetch(`${API_BASE}/documents/upload`, {

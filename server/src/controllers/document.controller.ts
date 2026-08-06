@@ -16,7 +16,8 @@ export const getDocumentById = (req: Request, res: Response) => {
 };
 
 export const uploadDocument = async (req: Request, res: Response) => {
-  const file = req.file;
+  const files = req.files as Express.Multer.File[] | undefined;
+  const file = req.file || (files && files.length > 0 ? files[0] : undefined);
   const fileName = file ? file.originalname : req.body.fileName || 'Uploaded_Document_2026.pdf';
   const fileType = file ? file.mimetype : 'application/pdf';
   const fileSize = file ? file.size : 2100000;
