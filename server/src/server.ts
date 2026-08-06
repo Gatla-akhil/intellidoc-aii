@@ -4,10 +4,13 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import path from 'path';
 import { env } from './config/env.js';
 import { logger } from './utils/logger.js';
 import apiRouter from './routes/api.routes.js';
 import { errorHandler } from './middleware/error.js';
+
+const clientDistPath = path.resolve(process.cwd(), '../client/dist');
 
 const app = express();
 const httpServer = createServer(app);
@@ -27,7 +30,7 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // Rate Limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 500,
+  max: 1000,
   message: { success: false, error: 'Too many requests, please try again later.' },
 });
 app.use('/api', limiter);
@@ -36,7 +39,7 @@ app.use('/api', limiter);
 app.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
-    platform: 'IntelliDoc AI Engine',
+    platform: 'IntelliDoc AI Unified Engine',
     version: '1.0.0',
     timestamp: new Date().toISOString(),
   });
@@ -44,6 +47,17 @@ app.get('/health', (req, res) => {
 
 // API Routes
 app.use('/api/v1', apiRouter);
+
+// Serve Production Static Frontend Assets
+app.use(express.static(clientDistPath));
+
+// Catch-All SPA Client Route
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api') || req.path === '/health') {
+    return next();
+  }
+  res.sendFile(path.join(clientDistPath, 'index.html'));
+});
 
 // Global Error Handler
 app.use(errorHandler);
@@ -62,11 +76,13 @@ io.on('connection', (socket) => {
   });
 });
 
-const PORT = env.PORT || 5000;
+const PORT = Number(env.PORT) || 5000;
 
 httpServer.listen(PORT, '0.0.0.0', () => {
   logger.info(`=======================================================`);
-  logger.info(`🚀 IntelliDoc AI Backend Core Active on port ${PORT}`);
+  logger.info(`🚀 IntelliDoc AI Unified Server Active on port ${PORT}`);
+  logger.info(`🌐 Full Application URL: http://localhost:${PORT}`);
   logger.info(`⚡ API Base URL: http://localhost:${PORT}/api/v1`);
+  logger.info(`📱 Mobile / Wi-Fi Access: http://10.60.9.24:${PORT}`);
   logger.info(`=======================================================`);
 });
