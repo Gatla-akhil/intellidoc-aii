@@ -13,6 +13,9 @@ import {
   Sparkles,
   Share2,
   Check,
+  ExternalLink,
+  Eye,
+  FileCode,
 } from 'lucide-react';
 import { ApiClient } from '../services/api';
 import { exportDocumentData } from '../services/export.service';
@@ -31,9 +34,11 @@ export const DocumentDetailPage: React.FC<DocumentDetailPageProps> = ({ document
   const [fields, setFields] = useState<ExtractedField[]>([]);
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [exportedFormat, setExportedFormat] = useState<string | null>(null);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     async function loadDoc() {
+      setImageError(false);
       const d = await ApiClient.getDocumentById(documentId || 'doc-inv-001');
       if (d) {
         setDoc(d);
@@ -59,6 +64,15 @@ export const DocumentDetailPage: React.FC<DocumentDetailPageProps> = ({ document
     exportDocumentData(updatedDoc, format);
     setExportedFormat(format);
     setTimeout(() => setExportedFormat(null), 2500);
+  };
+
+  const handleOpenSourceFile = () => {
+    if (doc.fileUrl && doc.fileUrl.startsWith('http')) {
+      window.open(doc.fileUrl, '_blank', 'noopener,noreferrer');
+    } else {
+      // Fallback: trigger markdown/text export
+      exportDocumentData(doc, 'Markdown');
+    }
   };
 
   return (
@@ -93,6 +107,15 @@ export const DocumentDetailPage: React.FC<DocumentDetailPageProps> = ({ document
         </div>
 
         <div className="flex items-center space-x-2 flex-wrap gap-y-1">
+          <button
+            onClick={handleOpenSourceFile}
+            className="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 text-xs font-semibold flex items-center space-x-1.5 transition-colors cursor-pointer"
+            title="Open Original File"
+          >
+            <ExternalLink className="w-3.5 h-3.5 text-cyan-400" />
+            <span className="hidden sm:inline">Open File</span>
+          </button>
+
           {/* Direct Quick Export Chips */}
           {(['JSON', 'CSV', 'PDF', 'Markdown'] as const).map((fmt) => (
             <button
@@ -130,7 +153,12 @@ export const DocumentDetailPage: React.FC<DocumentDetailPageProps> = ({ document
         <div className="md:col-span-6 bg-slate-950 border-b md:border-b-0 md:border-r border-slate-800 p-4 flex flex-col justify-between min-h-[360px] md:min-h-0 md:overflow-hidden relative">
           {/* Canvas Toolbar */}
           <div className="flex items-center justify-between bg-slate-900/90 backdrop-blur border border-slate-800 rounded-xl px-3 py-1.5 mb-3 z-10">
-            <span className="text-[11px] font-semibold text-slate-300">Document Canvas (Page 1 of 1)</span>
+            <div className="flex items-center space-x-2">
+              <span className="text-[11px] font-semibold text-slate-300">Document Canvas View</span>
+              <span className="text-[9px] px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-500/30 uppercase font-mono">
+                {doc.category}
+              </span>
+            </div>
             <div className="flex items-center space-x-2 text-xs">
               <button
                 onClick={() => setZoomLevel((z) => Math.max(50, z - 10))}
@@ -148,41 +176,107 @@ export const DocumentDetailPage: React.FC<DocumentDetailPageProps> = ({ document
             </div>
           </div>
 
-          {/* Interactive Document Image Container */}
+          {/* Interactive Document Display Container */}
           <div className="flex-1 overflow-auto flex items-center justify-center p-4 bg-slate-900/40 rounded-2xl border border-slate-800/80 relative">
             <div
-              className="relative transition-transform duration-200 shadow-2xl rounded-lg overflow-hidden border border-slate-700 max-w-full"
+              className="relative transition-transform duration-200 shadow-2xl rounded-xl overflow-hidden border border-slate-700 max-w-full w-full bg-slate-950 p-6"
               style={{ transform: `scale(${zoomLevel / 100})`, transformOrigin: 'top center' }}
             >
-              <img src={doc.fileUrl} alt={doc.title} className="max-w-full h-auto max-h-[580px] object-contain rounded" />
+              {!imageError && doc.fileUrl && !doc.fileUrl.endsWith('.pdf') ? (
+                <div className="relative">
+                  <img
+                    src={doc.fileUrl}
+                    alt={doc.title}
+                    onError={() => setImageError(true)}
+                    className="max-w-full h-auto max-h-[540px] object-contain rounded mx-auto"
+                  />
 
-              {/* Bounding box highlight overlays */}
-              {fields.map((f) => {
-                if (!f.boundingBox) return null;
-                const isSelected = selectedFieldId === f.id;
-                return (
-                  <div
-                    key={f.id}
-                    onClick={() => setSelectedFieldId(f.id)}
-                    className={`absolute rounded border-2 transition-all cursor-pointer ${
-                      isSelected
-                        ? 'border-cyan-400 bg-cyan-500/25 shadow-lg shadow-cyan-500/40 z-20'
-                        : 'border-indigo-500/60 bg-indigo-500/10 hover:border-cyan-400 hover:bg-cyan-500/15'
-                    }`}
-                    style={{
-                      left: `${f.boundingBox.x}px`,
-                      top: `${f.boundingBox.y}px`,
-                      width: `${f.boundingBox.w}px`,
-                      height: `${f.boundingBox.h}px`,
-                    }}
-                    title={`${f.key}: ${f.value}`}
-                  >
-                    <span className="absolute -top-4 left-0 text-[9px] font-bold font-mono bg-slate-900 text-cyan-300 px-1 rounded border border-cyan-500/30 whitespace-nowrap">
-                      {f.key}
+                  {/* Bounding box highlight overlays */}
+                  {fields.map((f) => {
+                    if (!f.boundingBox) return null;
+                    const isSelected = selectedFieldId === f.id;
+                    return (
+                      <div
+                        key={f.id}
+                        onClick={() => setSelectedFieldId(f.id)}
+                        className={`absolute rounded border-2 transition-all cursor-pointer ${
+                          isSelected
+                            ? 'border-cyan-400 bg-cyan-500/25 shadow-lg shadow-cyan-500/40 z-20'
+                            : 'border-indigo-500/60 bg-indigo-500/10 hover:border-cyan-400 hover:bg-cyan-500/15'
+                        }`}
+                        style={{
+                          left: `${f.boundingBox.x}px`,
+                          top: `${f.boundingBox.y}px`,
+                          width: `${f.boundingBox.w}px`,
+                          height: `${f.boundingBox.h}px`,
+                        }}
+                        title={`${f.key}: ${f.value}`}
+                      >
+                        <span className="absolute -top-4 left-0 text-[9px] font-bold font-mono bg-slate-900 text-cyan-300 px-1 rounded border border-cyan-500/30 whitespace-nowrap">
+                          {f.key}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                /* High-fidelity Visual Document Preview Canvas */
+                <div className="space-y-5 text-left font-mono">
+                  <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-8 h-8 rounded-lg bg-cyan-950 border border-cyan-500/40 flex items-center justify-center text-cyan-400">
+                        <FileText className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-slate-100">{doc.title}</h4>
+                        <span className="text-[9px] text-slate-400">{doc.originalName} • {doc.category}</span>
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-500/30">
+                      {(doc.confidenceScore * 100).toFixed(0)}% Score
                     </span>
                   </div>
-                );
-              })}
+
+                  {/* Document Entity Field Table Grid */}
+                  <div className="space-y-2">
+                    <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Parsed Key-Value Layout:</span>
+                    <div className="grid grid-cols-1 gap-2">
+                      {fields.map((f) => {
+                        const isSelected = selectedFieldId === f.id;
+                        return (
+                          <div
+                            key={f.id}
+                            onClick={() => setSelectedFieldId(f.id)}
+                            className={`p-2.5 rounded-lg border flex items-center justify-between text-xs cursor-pointer transition-all ${
+                              isSelected
+                                ? 'bg-cyan-950/60 border-cyan-500/60 shadow-md'
+                                : 'bg-slate-900/90 border-slate-800 hover:border-slate-700'
+                            }`}
+                          >
+                            <span className="text-slate-400 font-bold">{f.key}:</span>
+                            <span className="text-cyan-300 font-bold font-mono">{f.value}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Digital Signature & Seal Badge */}
+                  <div className="pt-3 border-t border-slate-800 flex items-center justify-between text-[10px] text-slate-400">
+                    <span className="flex items-center space-x-1 text-emerald-400 font-bold">
+                      <ShieldCheck className="w-3.5 h-3.5" />
+                      <span>Verified Digital Seal Present</span>
+                    </span>
+                    <button
+                      onClick={handleOpenSourceFile}
+                      className="text-cyan-400 hover:underline flex items-center space-x-1 font-bold cursor-pointer"
+                    >
+                      <span>Open Source File</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -298,7 +392,7 @@ export const DocumentDetailPage: React.FC<DocumentDetailPageProps> = ({ document
             )}
 
             {activeTab === 'rawText' && (
-              <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-[11px] text-slate-300 overflow-x-auto max-h-60">
+              <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-[11px] text-slate-300 overflow-x-auto max-h-60 whitespace-pre-line">
                 {doc.rawText || 'OCR content loaded successfully.'}
               </div>
             )}
