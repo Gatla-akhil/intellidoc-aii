@@ -62,7 +62,7 @@ export const DocumentDetailPage: React.FC<DocumentDetailPageProps> = ({ document
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-61px)] text-left overflow-hidden relative">
+    <div className="flex flex-col md:h-[calc(100dvh-61px)] min-h-[calc(100dvh-61px)] text-left md:overflow-hidden overflow-y-auto relative">
       {/* Toast Notification when Export Triggered */}
       {exportedFormat && (
         <div className="absolute top-16 right-6 z-50 px-4 py-3 rounded-2xl bg-emerald-950/90 border border-emerald-500/40 text-xs font-bold text-emerald-300 flex items-center space-x-2 shadow-2xl animate-bounce">
@@ -72,7 +72,7 @@ export const DocumentDetailPage: React.FC<DocumentDetailPageProps> = ({ document
       )}
 
       {/* Top Action Header Bar */}
-      <div className="bg-slate-950 border-b border-slate-800 px-6 py-3 flex items-center justify-between">
+      <div className="bg-slate-950 border-b border-slate-800 px-4 md:px-6 py-3 flex flex-wrap items-center justify-between gap-3 shrink-0">
         <div className="flex items-center space-x-4">
           <button
             onClick={() => onNavigate('documents')}
@@ -92,13 +92,13 @@ export const DocumentDetailPage: React.FC<DocumentDetailPageProps> = ({ document
           </div>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 flex-wrap gap-y-1">
           {/* Direct Quick Export Chips */}
           {(['JSON', 'CSV', 'PDF', 'Markdown'] as const).map((fmt) => (
             <button
               key={fmt}
               onClick={() => handleExport(fmt)}
-              className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white text-[11px] font-mono font-bold flex items-center space-x-1 transition-colors cursor-pointer"
+              className="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white text-[10px] md:text-[11px] font-mono font-bold flex items-center space-x-1 transition-colors cursor-pointer"
               title={`Download ${fmt}`}
             >
               <Download className="w-3 h-3 text-cyan-400" />
@@ -108,10 +108,10 @@ export const DocumentDetailPage: React.FC<DocumentDetailPageProps> = ({ document
 
           <button
             onClick={() => setExportModalOpen(true)}
-            className="px-3.5 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold flex items-center space-x-2 transition-colors shadow-md shadow-cyan-500/20 cursor-pointer ml-2"
+            className="px-3 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold flex items-center space-x-1.5 transition-colors shadow-md shadow-cyan-500/20 cursor-pointer"
           >
             <Download className="w-3.5 h-3.5" />
-            <span>Export Options</span>
+            <span className="hidden sm:inline">Export Options</span>
           </button>
 
           <button
@@ -125,9 +125,9 @@ export const DocumentDetailPage: React.FC<DocumentDetailPageProps> = ({ document
       </div>
 
       {/* Main Dual Panel Container */}
-      <div className="grid md:grid-cols-12 flex-1 overflow-hidden">
+      <div className="grid md:grid-cols-12 flex-1 md:overflow-hidden overflow-y-auto">
         {/* Left Panel: Document Viewer Canvas (Col 6) */}
-        <div className="md:col-span-6 bg-slate-950 border-r border-slate-800 p-4 flex flex-col justify-between overflow-hidden relative">
+        <div className="md:col-span-6 bg-slate-950 border-b md:border-b-0 md:border-r border-slate-800 p-4 flex flex-col justify-between min-h-[360px] md:min-h-0 md:overflow-hidden relative">
           {/* Canvas Toolbar */}
           <div className="flex items-center justify-between bg-slate-900/90 backdrop-blur border border-slate-800 rounded-xl px-3 py-1.5 mb-3 z-10">
             <span className="text-[11px] font-semibold text-slate-300">Document Canvas (Page 1 of 1)</span>

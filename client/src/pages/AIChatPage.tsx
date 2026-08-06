@@ -45,7 +45,7 @@ export const AIChatPage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-61px)] max-w-5xl mx-auto p-4 lg:p-6 text-left">
+    <div className="flex flex-col h-[calc(100dvh-61px)] min-h-[calc(100dvh-61px)] max-w-5xl mx-auto p-3 sm:p-4 lg:p-6 text-left">
       {/* Header */}
       <div className="flex items-center justify-between pb-4 border-b border-slate-800">
         <div className="flex items-center space-x-3">
