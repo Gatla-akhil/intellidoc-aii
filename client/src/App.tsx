@@ -8,6 +8,7 @@ import { LandingPage } from './pages/LandingPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { UploadPage } from './pages/UploadPage';
 import { DocumentDetailPage } from './pages/DocumentDetailPage';
+import { HistoryPage } from './pages/HistoryPage';
 import { AIChatPage } from './pages/AIChatPage';
 import { AutonomousAssistantPage } from './pages/AutonomousAssistantPage';
 import { ReportGeneratorPage } from './pages/ReportGeneratorPage';
@@ -55,7 +56,7 @@ export function App() {
       <Navbar
         currentTab={currentTab}
         onNavigate={handleNavigate}
-        onOpenCommandPalette={() => setCommandPaletteOpen(true)}
+        onOpenCommandPalette={() => setCommandPaletteOpen(false)}
         isDark={isDark}
         onToggleTheme={toggleTheme}
       />
@@ -75,6 +76,7 @@ export function App() {
           {currentTab === 'autonomous' && <AutonomousAssistantPage />}
           {currentTab === 'upload' && <UploadPage onNavigate={handleNavigate} />}
           {currentTab === 'documents' && <DocumentDetailPage documentId={selectedDocId} onNavigate={handleNavigate} />}
+          {currentTab === 'history' && <HistoryPage />}
           {currentTab === 'chat' && <AIChatPage />}
           {currentTab === 'report-gen' && <ReportGeneratorPage />}
           {currentTab === 'ledger' && <BlockchainAuditPage />}

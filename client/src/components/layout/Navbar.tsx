@@ -26,6 +26,7 @@ import {
   Bot,
   Presentation,
   Hash,
+  History,
 } from 'lucide-react';
 import { NotificationCenter } from './NotificationCenter';
 
@@ -49,6 +50,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'autonomous', label: 'Autonomous AI Assistant', icon: Bot, highlight: true },
     { id: 'upload', label: 'Upload & Process', icon: UploadCloud },
     { id: 'documents', label: 'Document Library', icon: FileText },
+    { id: 'history', label: 'History & Logs', icon: History },
     { id: 'chat', label: 'RAG AI Chat', icon: MessageSquareCode },
     { id: 'workflow', label: 'AI Workflow Builder', icon: GitBranch },
     { id: 'graph', label: 'Knowledge Graph', icon: Network },
@@ -101,6 +103,15 @@ export const Navbar: React.FC<NavbarProps> = ({
             <kbd className="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-mono bg-slate-800 text-slate-300 rounded border border-slate-700">
               <Command className="w-2.5 h-2.5" /> K
             </kbd>
+          </button>
+
+          {/* Quick History Button */}
+          <button
+            onClick={() => onNavigate('history')}
+            className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-100 transition-colors cursor-pointer"
+            title="View Action History"
+          >
+            <History className="w-4 h-4 text-cyan-400" />
           </button>
 
           {/* Smart Notification Center */}
