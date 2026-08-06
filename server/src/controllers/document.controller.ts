@@ -8,7 +8,7 @@ import { validatorService } from '../services/validation/validator.service.js';
 export const getDocuments = async (req: Request, res: Response) => {
   if (supabaseService.isConnected()) {
     const supabaseDocs = await supabaseService.getDocuments();
-    if (supabaseDocs) {
+    if (supabaseDocs && supabaseDocs.length > 0) {
       return res.json({ success: true, count: supabaseDocs.length, data: supabaseDocs });
     }
   }
