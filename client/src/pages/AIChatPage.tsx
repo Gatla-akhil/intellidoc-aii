@@ -39,7 +39,7 @@ export const AIChatPage: React.FC = () => {
     if (!textToSend) setInput('');
     setIsTyping(true);
 
-    const botResponse = await ApiClient.sendChatMessage(query);
+    const botResponse = await ApiClient.sendChatMessage(undefined, query);
     setIsTyping(false);
     setMessages((prev) => [...prev, botResponse]);
   };
