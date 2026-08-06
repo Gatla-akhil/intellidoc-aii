@@ -12,6 +12,8 @@ const envSchema = z.object({
   JWT_EXPIRES_IN: z.string().default('7d'),
   GEMINI_API_KEY: z.string().optional(),
   OPENAI_API_KEY: z.string().optional(),
+  SUPABASE_URL: z.string().optional(),
+  SUPABASE_KEY: z.string().optional(),
   OCR_ENGINE: z.string().default('vision'),
 });
 
