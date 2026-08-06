@@ -57,7 +57,7 @@ export class AIService {
 
     if (this.aiClient) {
       try {
-        const model = this.aiClient.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const model = this.aiClient.getGenerativeModel({ model: 'gemini-2.0-flash' });
         const response = await model.generateContent(
           `Perform deep enterprise document analysis on file ${fileName} (${fileType}). Provide structured JSON output containing category, summary, extracted fields, fraud indicators, signatures, stamps, PII count, and risk flags. Raw text snippet: ${rawContent?.slice(0, 1500) || 'Sample document content'}`
         );
