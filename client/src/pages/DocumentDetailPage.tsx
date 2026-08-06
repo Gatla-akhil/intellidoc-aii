@@ -14,6 +14,7 @@ import {
   Share2,
 } from 'lucide-react';
 import { ApiClient } from '../services/api';
+import { exportDocumentData } from '../services/export.service';
 import { DocumentItem, ExtractedField } from '../types';
 
 interface DocumentDetailPageProps {
@@ -288,16 +289,21 @@ export const DocumentDetailPage: React.FC<DocumentDetailPageProps> = ({ document
             <h3 className="text-sm font-bold text-slate-100">Export Extracted Intelligence</h3>
             <p className="text-xs text-slate-400">Select export format for parsed fields and confidence data:</p>
             <div className="grid grid-cols-2 gap-3">
-              {['JSON Format', 'CSV Spreadsheet', 'PDF Document', 'Markdown Text'].map((fmt, i) => (
+              {[
+                { label: 'JSON Format', format: 'JSON' as const },
+                { label: 'CSV Spreadsheet', format: 'CSV' as const },
+                { label: 'PDF Document', format: 'PDF' as const },
+                { label: 'Markdown Text', format: 'Markdown' as const },
+              ].map((item, i) => (
                 <button
                   key={i}
                   onClick={() => {
-                    alert(`Exporting document data as ${fmt}...`);
+                    if (doc) exportDocumentData(doc, item.format);
                     setExportModalOpen(false);
                   }}
-                  className="p-3 rounded-xl bg-slate-950 hover:bg-cyan-950 hover:border-cyan-500/50 border border-slate-800 text-xs font-bold text-slate-200 transition-all text-center"
+                  className="p-3 rounded-xl bg-slate-950 hover:bg-cyan-950 hover:border-cyan-500/50 border border-slate-800 text-xs font-bold text-slate-200 transition-all text-center cursor-pointer"
                 >
-                  {fmt}
+                  {item.label}
                 </button>
               ))}
             </div>
