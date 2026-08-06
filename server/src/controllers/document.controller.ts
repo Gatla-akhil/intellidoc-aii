@@ -1,15 +1,29 @@
 import { Request, Response } from 'express';
 import { dbStore, DocumentModel } from '../services/db.service.js';
+import { supabaseService } from '../services/supabase.service.js';
 import { aiService } from '../services/ai/ai.service.js';
 import { ocrService } from '../services/ocr/ocr.service.js';
 import { validatorService } from '../services/validation/validator.service.js';
 
-export const getDocuments = (req: Request, res: Response) => {
+export const getDocuments = async (req: Request, res: Response) => {
+  if (supabaseService.isConnected()) {
+    const supabaseDocs = await supabaseService.getDocuments();
+    if (supabaseDocs) {
+      return res.json({ success: true, count: supabaseDocs.length, data: supabaseDocs });
+    }
+  }
   const docs = dbStore.getAll();
   return res.json({ success: true, count: docs.length, data: docs });
 };
 
-export const getDocumentById = (req: Request, res: Response) => {
+export const getDocumentById = async (req: Request, res: Response) => {
+  if (supabaseService.isConnected()) {
+    const supabaseDocs = await supabaseService.getDocuments();
+    if (supabaseDocs) {
+      const doc = supabaseDocs.find((d) => d.id === req.params.id);
+      if (doc) return res.json({ success: true, data: doc });
+    }
+  }
   const doc = dbStore.getById(req.params.id);
   if (!doc) return res.status(404).json({ success: false, error: 'Document not found' });
   return res.json({ success: true, data: doc });
@@ -31,13 +45,20 @@ export const uploadDocument = async (req: Request, res: Response) => {
   // Validation
   const valRes = validatorService.validateInvoiceData(13500, 1350, 14850);
 
+  let uploadedUrl = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop';
+  if (file && supabaseService.isConnected()) {
+    const path = `uploads/${Date.now()}_${fileName}`;
+    const supabaseUrl = await supabaseService.uploadFile('documents', path, file.buffer, fileType);
+    if (supabaseUrl) uploadedUrl = supabaseUrl;
+  }
+
   const newDoc: DocumentModel = {
     id: `doc-${Date.now()}`,
     title: fileName.replace(/\.[^/.]+$/, '').replace(/_/g, ' '),
     originalName: fileName,
     fileType,
     category: aiRes.category,
-    fileUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop',
+    fileUrl: uploadedUrl,
     fileSize,
     status: 'COMPLETED',
     confidenceScore: aiRes.confidenceScore,
@@ -57,6 +78,9 @@ export const uploadDocument = async (req: Request, res: Response) => {
   };
 
   dbStore.add(newDoc);
+  if (supabaseService.isConnected()) {
+    await supabaseService.insertDocument(newDoc);
+  }
 
   return res.status(201).json({
     success: true,
