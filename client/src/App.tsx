@@ -56,7 +56,7 @@ export function App() {
       <Navbar
         currentTab={currentTab}
         onNavigate={handleNavigate}
-        onOpenCommandPalette={() => setCommandPaletteOpen(false)}
+        onOpenCommandPalette={() => setCommandPaletteOpen(true)}
         isDark={isDark}
         onToggleTheme={toggleTheme}
       />
